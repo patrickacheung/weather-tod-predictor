@@ -1,6 +1,8 @@
 # pylint: disable=missing-docstring, invalid-name, line-too-long
 """
-Predicts tomorrow's weather based on previous day's observation data and images.
+Predicts tomorrow's weather description and temperature based on previous day's
+observation data and images.
+
 Outputs analysis graphs.
 """
 import sys
