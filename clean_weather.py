@@ -17,7 +17,7 @@ img_fn_re = re.compile(r'[a-z]{6}-\d{14}.jpg')
 
 # Weather description regex.
 # Adapted regex from: https://stackoverflow.com/a/3040797
-w_rgx = ['Clear', 'Cloudy', 'Rain', 'Fog', 'Snow', 'Thunder', 'Drizzle']
+w_rgx = ['Clear', 'Cloudy', 'Rain', 'Fog', 'Snow', 'Thunderstorm', 'Drizzle']
 combined = "(" + ")|(".join(w_rgx) + ")" # Middle repeats.
 ctgy_re = re.compile(combined)
 
@@ -118,9 +118,20 @@ def get_imgs_fns(in_dir):
 Cleans up description so they are more concrete
 """
 def clean_descrip(col):
-    match = ctgy_re.match(col)
-    if match:
-        print(match.group(0))
+    matches = ctgy_re.findall(col)
+
+    # Adapted list comprehension from: https://stackoverflow.com/a/40598337
+    # and https://stackoverflow.com/a/10941335
+    if matches:
+        # a = [(t), (t, t, t), (t)] where list is a and tuple is t
+        # x is iter
+        deslist = [x for t in matches for x in t if x]
+
+        # Replace 'Drizzle' with 'Rain' and remove dups
+        deslist[:] = [w.replace('Drizzle', 'Rain') for w in deslist]
+        # Dict comprehension: https://stackoverflow.com/a/1747827
+        no_dups_deslist = {k:0 for k in deslist}.keys()
+        return ','.join(no_dups_deslist)
 
     return col
 
@@ -140,8 +151,8 @@ def main():
     # Clean up 'Weather' column so descriptions are more concrete.
     obs_imgs['Weather'] = obs_imgs['Weather'].apply(clean_descrip)
 
-    print(obs_imgs['Weather'].unique())
-    #obs_imgs.to_csv('weather_data.csv', index=False)
+    #print(obs_imgs['Weather'].unique())
+    obs_imgs.to_csv('weather_data.csv', index=False)
 
 
 if __name__ == '__main__':
