@@ -15,6 +15,12 @@ filename_re = re.compile(r'(\d{4})-(\d{2})-(\d{02}) (\d{02}):(\d{02})')
 # Img filename regex: katkam-yyyymmddhhmmss.jpg
 img_fn_re = re.compile(r'[a-z]{6}-\d{14}.jpg')
 
+# Weather description regex.
+# Adapted regex from: https://stackoverflow.com/a/3040797
+w_rgx = ['Clear', 'Cloudy', 'Rain', 'Fog', 'Snow', 'Thunder', 'Drizzle']
+combined = "(" + ")|(".join(w_rgx) + ")" # Middle repeats.
+ctgy_re = re.compile(combined)
+
 """
 Joins multiple csv files into a single dataframe.
 """
@@ -112,9 +118,9 @@ def get_imgs_fns(in_dir):
 Cleans up description so they are more concrete
 """
 def clean_descrip(col):
-    ctgy = ['Clear', 'Cloudy', 'Rain', 'Fog', 'Snow']
-
-    
+    match = ctgy_re.match(col)
+    if match:
+        print(match.group(0))
 
     return col
 
