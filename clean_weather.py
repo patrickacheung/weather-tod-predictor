@@ -40,7 +40,12 @@ def get_joined_data(in_dir):
 Cleans and adds columns to make data useable.
 """
 def pre_process(obs):
-    obs.dropna(how='any', subset=['Date/Time', 'Weather'], inplace=True)
+    subset = [
+        'Date/Time', 'Temp (°C)', 'Dew Point Temp (°C)', 'Rel Hum (%)',
+        'Wind Dir (10s deg)', 'Wind Spd (km/h)', 'Visibility (km)',
+        'Stn Press (kPa)', 'Weather'
+    ]
+    obs.dropna(how='any', subset=subset, inplace=True)
 
     # Unused properties.
     drop_list = [
