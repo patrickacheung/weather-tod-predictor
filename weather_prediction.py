@@ -1,6 +1,7 @@
 # pylint: disable=missing-docstring, invalid-name, line-too-long
 """
-header
+Predicts tomorrow's weather based on previous day's observation data and images.
+Outputs analysis graphs.
 """
 import sys
 import pandas as pd
