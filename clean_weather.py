@@ -46,9 +46,7 @@ def pre_process(obs):
         'Wind Spd Flag',
         'Visibility Flag',
         'Stn Press Flag',
-        'Hmdx',
         'Hmdx Flag',
-        'Wind Chill',
         'Wind Chill Flag'
     ]
     obs.drop(drop_list, axis=1, inplace=True)
@@ -110,6 +108,17 @@ def get_imgs_fns(in_dir):
     return imgs
 
 
+"""
+Cleans up description so they are more concrete
+"""
+def clean_descrip(col):
+    ctgy = ['Clear', 'Cloudy', 'Rain', 'Fog', 'Snow']
+
+    
+
+    return col
+
+
 def main():
     in_dir_obs = sys.argv[1]
     in_dir_img = sys.argv[2]
@@ -120,10 +129,13 @@ def main():
     imgs = get_imgs_fns(in_dir_img)
 
     obs_imgs = pd.merge(obs_clean, imgs, how='inner', on='filename', sort=False)
-    #do some post_process
-    #rename the 'Weather' column to something more concrete.
+    # Clean up some headers.
+    obs_imgs = obs_imgs.rename(columns={'Temp (°C)': 'Temp (C)', 'Dew Point Temp (°C)': 'Dew Point Temp (C)'})
+    # Clean up 'Weather' column so descriptions are more concrete.
+    obs_imgs['Weather'] = obs_imgs['Weather'].apply(clean_descrip)
 
-    obs_imgs.to_csv('weather_data.csv', index=False)
+    print(obs_imgs['Weather'].unique())
+    #obs_imgs.to_csv('weather_data.csv', index=False)
 
 
 if __name__ == '__main__':
