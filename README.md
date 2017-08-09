@@ -16,7 +16,7 @@ This project attempts to use ML to predict an image's weather and time of day.
 
 2. Run *clean_weather.py* to clean and combine weather data.
 
-    ```sh
+    ```
     $ python3 clean_weather.py <weather data folder> <image folder>
     ```
 
@@ -24,7 +24,7 @@ This project attempts to use ML to predict an image's weather and time of day.
 
 3. Run *weather_prediction.py* to see ML score and produce graphs for analysis.
 
-    ```sh
+    ```
     $ python3 weather_prediction.py <weather data folder> <image folder>
     ```
 
