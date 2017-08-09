@@ -1,16 +1,17 @@
 # pylint: disable=missing-docstring, invalid-name, line-too-long
 """
-Predicts tomorrow's weather description and temperature based on previous day's
-observation data and images.
-
-Outputs analysis graphs.
+Predicts the image's current weather category.
+Categories are Clear, Cloudy, Fog, Rain, Snow, Thunderstorm.
 """
 import sys
-import numpy as np
 import pandas as pd
 from scipy import misc
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from sklearn.pipeline import make_pipeline
 
 """
 Returns images as a 1-d array
@@ -28,10 +29,10 @@ def get_images(path, filenames):
 
 
 """
-Returns array that keeps every 16th pixel.
+Returns array that keeps every 8th pixel.
 """
 def reduce_pixels(col):
-    return col[1::16]
+    return col[1::8]
 
 
 def main():
@@ -54,9 +55,8 @@ def main():
     img_pts = pd.DataFrame(data_imgs['img'].values.tolist())
     data_imgs_pts = data_imgs.join(img_pts)
 
-    # Hard coding 9216 image points from keeping every 16th pixel.
-    int_list = list(range(0, 9216))
-    #str_list = [str(x) for x in int_list]
+    # Hard coding 18432 image points from keeping every 8th pixel.
+    int_list = list(range(0, 18432))
 
     features = [
         'Temp (C)', 'Dew Point Temp (C)', 'Rel Hum (%)', 'Wind Dir (10s deg)', 'Wind Spd (km/h)',
@@ -67,11 +67,16 @@ def main():
     y = data_imgs_pts['Weather'].values
 
     X_train, X_test, y_train, y_test = train_test_split(X, y)
-    model = KNeighborsClassifier(n_neighbors=45)
+    model = make_pipeline(
+        StandardScaler(),
+        PCA(500),
+        KNeighborsClassifier(n_neighbors=45)
+    )
     model.fit(X_train, y_train)
-    print(model.score(X_test, y_test))
+
     df = pd.DataFrame({'truth': y_test, 'prediction': model.predict(X_test)})
     print(df[df['truth'] != df['prediction']])
+    print(model.score(X_test, y_test))
 
 
 if __name__ == '__main__':
