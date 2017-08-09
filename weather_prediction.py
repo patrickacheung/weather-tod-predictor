@@ -2,9 +2,12 @@
 """
 Predicts the image's current weather category.
 Categories are Clear, Cloudy, Fog, Rain, Snow, Thunderstorm.
+Generates graphs.
 """
+import seaborn
 import sys
 import pandas as pd
+import matplotlib.pyplot as plt
 from scipy import misc
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
@@ -72,11 +75,11 @@ def main():
         PCA(500),
         SVC(kernel='linear', C=5)
     )
-    model_category.fit(X_train, y_train)
+    #model_category.fit(X_train, y_train)
 
-    df = pd.DataFrame({'truth': y_test, 'prediction': model_category.predict(X_test)})
-    print(df[df['truth'] != df['prediction']])
-    print(model_category.score(X_test, y_test))
+    #df = pd.DataFrame({'truth': y_test, 'prediction': model_category.predict(X_test)})
+    #print(df[df['truth'] != df['prediction']])
+    #print('category score: ', model_category.score(X_test, y_test))
 
     # ToD prediction.
     X_tod = X
@@ -92,8 +95,22 @@ def main():
     model_tod.fit(X_tod_train, y_tod_train)
 
     df_tod = pd.DataFrame({'truth': y_tod_test, 'prediction': model_tod.predict(X_tod_test)})
-    print(df_tod[df_tod['truth'] != df_tod['prediction']])
-    print(model_tod.score(X_tod_test, y_tod_test))
+    df_tod = df_tod[df_tod['truth'] != df_tod['prediction']]
+
+    df_tod['prediction'] = pd.to_datetime(df_tod['prediction'])
+    df_tod['truth'] = pd.to_datetime(df_tod['truth'])
+    df_tod['diff (hrs)'] = df_tod['prediction'].dt.hour - df_tod['truth'].dt.hour
+
+    tod_counts = df_tod.groupby('diff (hrs)').count().reset_index()
+    plt.figure(figsize=(10, 7))
+    plt.suptitle('Difference Between Predicted Time and Actual Time')
+    plt.ylabel('Count')
+    plt.xlabel('Difference (hours)')
+    plt.bar(tod_counts['diff (hrs)'], tod_counts['truth'], align='center', alpha=0.5)
+    seaborn.set()
+    plt.savefig('tod_count.png')
+
+    print('tod score: ', model_tod.score(X_tod_test, y_tod_test))
 
 
 if __name__ == '__main__':
