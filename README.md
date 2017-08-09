@@ -25,7 +25,7 @@ This project attempts to use ML to predict an image's weather and time of day.
 3. Run *weather_prediction.py* to see ML score and produce graphs for analysis.
 
     ```
-    $ python3 weather_prediction.py <weather data folder> <image folder>
+    $ python3 weather_prediction.py weather_data.csv <image folder>
     ```
 
     Two graphs *ctgy_count.png* and *tod_count.png* will be created.
