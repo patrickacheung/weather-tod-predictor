@@ -7,11 +7,10 @@ import sys
 import pandas as pd
 from scipy import misc
 from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 
 """
 Returns images as a 1-d array
@@ -63,20 +62,38 @@ def main():
         'Visibility (km)', 'Stn Press (kPa)'#, 'img'
     ] + int_list
 
+    # Weather category prediction.
     X = data_imgs_pts[features].values
     y = data_imgs_pts['Weather'].values
 
     X_train, X_test, y_train, y_test = train_test_split(X, y)
-    model = make_pipeline(
+    model_category = make_pipeline(
         StandardScaler(),
         PCA(500),
-        KNeighborsClassifier(n_neighbors=45)
+        SVC(kernel='linear', C=5)
     )
-    model.fit(X_train, y_train)
+    model_category.fit(X_train, y_train)
 
-    df = pd.DataFrame({'truth': y_test, 'prediction': model.predict(X_test)})
+    df = pd.DataFrame({'truth': y_test, 'prediction': model_category.predict(X_test)})
     print(df[df['truth'] != df['prediction']])
-    print(model.score(X_test, y_test))
+    print(model_category.score(X_test, y_test))
+
+    # ToD prediction.
+    X_tod = X
+    y_tod = data_imgs_pts['Time'].values
+
+    X_tod_train, X_tod_test, y_tod_train, y_tod_test = train_test_split(X_tod, y_tod)
+
+    model_tod = make_pipeline(
+        StandardScaler(),
+        PCA(500),
+        SVC(kernel='linear', C=1000)
+    )
+    model_tod.fit(X_tod_train, y_tod_train)
+
+    df_tod = pd.DataFrame({'truth': y_tod_test, 'prediction': model_tod.predict(X_tod_test)})
+    print(df_tod[df_tod['truth'] != df_tod['prediction']])
+    print(model_tod.score(X_tod_test, y_tod_test))
 
 
 if __name__ == '__main__':
