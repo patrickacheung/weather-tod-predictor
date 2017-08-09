@@ -4,8 +4,8 @@ Predicts the image's current weather category.
 Categories are Clear, Cloudy, Fog, Rain, Snow, Thunderstorm.
 Generates graphs.
 """
-import seaborn
 import sys
+import seaborn
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import misc
@@ -75,11 +75,24 @@ def main():
         PCA(500),
         SVC(kernel='linear', C=5)
     )
-    #model_category.fit(X_train, y_train)
+    model_category.fit(X_train, y_train)
 
-    #df = pd.DataFrame({'truth': y_test, 'prediction': model_category.predict(X_test)})
-    #print(df[df['truth'] != df['prediction']])
-    #print('category score: ', model_category.score(X_test, y_test))
+    df = pd.DataFrame({'truth': y_test, 'prediction': model_category.predict(X_test)})
+    df = df[df['truth'] != df['prediction']]
+
+    ctgy_counts = df.groupby('prediction').count().reset_index()
+    xticks_labels = ctgy_counts['prediction'].values
+
+    plt.figure(figsize=(10, 7))
+    plt.suptitle('Weather Description Incorrect Counts')
+    plt.ylabel('Count')
+    plt.xlabel('Category')
+    plt.xticks(ctgy_counts.index.values, xticks_labels)
+    plt.bar(ctgy_counts.index.values, ctgy_counts['truth'], align='center', alpha=0.5)
+    seaborn.set()
+    plt.savefig('ctgy_count.png')
+
+    print('category score: ', model_category.score(X_test, y_test))
 
     # ToD prediction.
     X_tod = X
