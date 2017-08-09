@@ -61,7 +61,7 @@ def main():
     features = [
         'Temp (C)', 'Dew Point Temp (C)', 'Rel Hum (%)', 'Wind Dir (10s deg)', 'Wind Spd (km/h)',
         'Visibility (km)', 'Stn Press (kPa)'#, 'img'
-    ]# + str_list
+    ] + int_list
 
     X = data_imgs_pts[features].values
     y = data_imgs_pts['Weather'].values
